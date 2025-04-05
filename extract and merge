@@ -1,0 +1,94 @@
+##get daily PRISM data
+
+install.packages("prism")
+library(devtools)
+install_github("ropensci/prism")
+library(prism)
+
+prism_set_dl_dir("~/prismtmp")
+
+get_prism_dailys(
+  type = "tmax", 
+  minDate = "2013-01-01", 
+  maxDate = "2023-12-31", 
+  keepZip = FALSE
+)
+
+##extract the daily data and find the value for each centroid of ZCTAs, combined into one file
+
+#making a centroids dataset (csv) into a shapefile
+csv_sf <- st_as_sf(midwest_centroids, coords = c("INTPTLON10", "INTPTLAT10"))
+str(csv_sf)
+
+# Base directory containing your dated folders/files
+base_dir <- "/file_path_to_folder_containing_files"
+
+# List of folder names (replace this with your folder name structure)
+folder_names <- list.files(base_dir, full.names = TRUE)
+
+
+# Initialize an empty list to store results
+results_list <- list()
+
+# Loop through each folder and process its corresponding raster file
+for (folder in folder_names) {
+  # Construct the file path for the raster file
+  raster_file <- file.path(folder, paste0(basename(folder), ".bil"))
+  
+  # Read the raster file
+  data.r <- rast(raster_file)
+  
+  # Convert the raster to a data frame with coordinates
+  data.d <- as.data.frame(data.r, xy = TRUE)
+  
+  # Convert the data frame into a spatial object
+  data_sf <- st_as_sf(data.d, coords = c("x", "y"))
+  
+  # Set CRS for spatial compatibility
+  st_crs(data_sf) <- 4326
+  
+  # Perform spatial join using st_nearest_feature
+  join_sf <- csv_sf %>% 
+    cbind(
+      data_sf[st_nearest_feature(csv_sf, data_sf), ]
+    )
+  
+  # Detect the date column dynamically by matching a typical date pattern
+  # E.g., 8-digit format like "20230101" or similar
+  date_column_name <- names(join_sf)[grep("\\d{8}", names(join_sf))]
+  
+  # Add a check to ensure the date column is found
+  if (length(date_column_name) == 0) {
+    stop("No column with a date pattern (e.g., YYYYMMDD) found in join_sf. Please verify column naming.")
+  }
+  
+  # Rename the date column to include the folder identifier (to avoid conflicts)
+  names(join_sf)[names(join_sf) == date_column_name] <- paste0("ExtractValue_", basename(folder))
+  
+  # Add to results list
+  results_list[[basename(folder)]] <- join_sf
+}
+
+
+# Initialize an empty data frame for results
+final_data <- NULL
+
+# Loop through each result in the results_list
+for (name in names(results_list)) {
+  # Extract the non-spatial data (attributes) from the current `sf` object
+  df_subset <- st_drop_geometry(results_list[[name]])[, c(3, 12)]
+  
+  # Rename column 12 to include the file identifier (folder name or unique identifier)
+  colnames(df_subset)[2] <- paste0("Value_", name)
+  
+  # If it's the first iteration, initialize final_data
+  if (is.null(final_data)) {
+    final_data <- df_subset
+  } else {
+    # Merge based on column 3 (zip codes)
+    final_data <- merge(final_data, df_subset, by = colnames(df_subset)[1], all = TRUE)
+  }
+}
+
+# View the final result
+print(final_data)
