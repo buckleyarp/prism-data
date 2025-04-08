@@ -20,17 +20,21 @@ get_prism_dailys(
   keepZip = FALSE
 )
 
-##extract the daily data and find the value for each centroid of ZCTAs, combined into one file
+## extract the daily data and find the value for each centroid of ZCTAs, combined into one file
 
-#making a centroids dataset (csv) into a shapefile
+# making a centroids dataset (csv) into a shapefile
 csv_sf <- st_as_sf(midwest_centroids, coords = c("INTPTLON10", "INTPTLAT10"))
 str(csv_sf)
 
-#setting datum/projection so both datasets are matching
+# setting datum/projection so both datasets are matching
 st_crs(csv_sf) <- 4326
 
+# remove duplicated ZCTAs (crossing state boundaries)
+csv_sf <- csv_sf %>%
+  distinct(ZCTA5CE10,.keep_all = TRUE)
+
 # Base directory containing your dated folders/files
-#for example "/Users/lilyarp/prismtmp/prism_files" with all extracted prism files put into folder prism_files within prismtmp
+# for example "/Users/lilyarp/prismtmp/prism_files" with all extracted prism files put into folder prism_files within prismtmp
 base_dir <- "file_path_to_folder_containing_files"
 
 # List of folder names (replace this with your folder name structure)
