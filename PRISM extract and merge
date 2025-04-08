@@ -21,8 +21,10 @@ get_prism_dailys(
 )
 
 ## extract the daily data and find the value for each centroid of ZCTAs, combined into one file
+# this example uses a centroid dataset calculated in ArcGIS pro
 
 # making a centroids dataset (csv) into a shapefile
+# skip if already in shapefile format (ie centroids were calculated in R and not converted to .csv)
 csv_sf <- st_as_sf(midwest_centroids, coords = c("INTPTLON10", "INTPTLAT10"))
 str(csv_sf)
 
