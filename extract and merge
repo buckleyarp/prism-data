@@ -96,4 +96,16 @@ final_dataset <- Reduce(function(x, y) {
   merge(x, y, by = "ZCTA5CE10", all.x = TRUE)
 }, extracted_data)
 
+# turn data from wide format to long
+final_long <- melt(final_dataset, id = "ZCTA5CE10")
 
+# change the value column to "Tmax" 
+colnames(final_long)[3] <- "Tmax"
+
+# extract the date from the file name now located in the variable column
+final_long$date <- substr(final_long$variable, start = 38, stop = 45)
+
+# turn the date into date format
+final_long$date <- as.Date(final_long$date, "%Y%m%d")
+
+# you now have a file of daily Tmax values for your zipcodes of interest
