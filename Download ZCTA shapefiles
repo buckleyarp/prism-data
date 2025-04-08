@@ -9,6 +9,17 @@ IA_zcta <- zctas(cb = FALSE, starts_with = NULL, year = 2010, state = "IA")
 zcta_shp <- do.call("rbind", list(IL_zcta, IN_zcta, IA_zcta, MI_zcta, MN_zcta,
                                   ND_zcta, SD_zcta, WI_zcta))
 
+## to calculate the centroids of the ZCTAs
+# remove duplicated ZCTAs (those that span multiple states)
+zcta_shp <- zcta_shp %>%
+  distinct(ZCTA5CE10, .keep_all = TRUE)
+
+# calculate centroids
+library(sf)
+library(tidyverse)
+zcta_shp <- zcta_shp %>% 
+  mutate(centroids = st_centroid(st_geometry(geometry)))
+
 ## if you want to use these shapefiles for mapping in R
 
 library(ggplot2)
