@@ -1,0 +1,15 @@
+## finding the average Tmax value within a ZCTA polygon
+
+# importing a PRISM file as a raster
+prism <- raster("prism_files/PRISM_tmax_stable_4kmD2_20130101_bil/PRISM_tmax_stable_4kmD2_20130101_bil.bil")
+
+# calculates the mean value for the prism raster within each ZCTA polygon
+rast_mean <- extract(prism, zcta, fun = mean)
+# this step takes a while to run for a single raster and would likely be very memory heavy if doing many days
+
+# adds the calculated values to the ZCTA shapefile in the column tmax
+# the rast_mean output is only the numbers. they are in the order of the ZCTAs listed within the shapefile so it is important not to reorder them before merging
+zcta$tmax <- rast_mean[1:6502]
+
+# comparing this output with the output of the centroids gives a correlation coefficient of 0.9996447
+cor.test(test$Tmax, test$ExtractValue_PRISM_tmax_stable_4kmD2_20130101_bil)
