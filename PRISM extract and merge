@@ -37,7 +37,7 @@ csv_sf <- csv_sf %>%
   distinct(ZCTA5CE10,.keep_all = TRUE)
 
 # Base directory containing your dated folders/files
-# for example "/Users/lilyarp/prismtmp/prism_files" with all extracted prism files put into folder prism_files within prismtmp
+# for example "User/name/prismtmp/prism_files" with all extracted prism files put into folder prism_files within prismtmp
 base_dir <- "file_path_to_folder_containing_files"
 
 # List of folder names (replace this with your folder name structure)
