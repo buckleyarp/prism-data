@@ -1,5 +1,6 @@
 ## to download shapefiles of ZCTAs from the census 
 
+# this package also allows for other geographical features (counties, census blocks, etc)
 library(tigris)
 
 # Iowa zip codes
@@ -26,7 +27,7 @@ library(ggplot2)
 library(viridisLite)
 
 # example, you want to map the wildfire pm2.5 sum for 2006 (found in example dataset zctaPM)
-# you could also daily weather conditions or average weather conditions over a period of time from PRISM data
+# you could also use daily weather conditions or average weather conditions over a period of time from PRISM data
 
 zcta_shp <- merge(zcta_shp, zctaPM, by = "ZCTA5CE10", all.x = TRUE)
 map_06_sum <- ggplot() + 
@@ -49,4 +50,5 @@ IL_adi <- get_adi(geography = "zcta",
         state = "17",
         year = 2019,
         dataset = "acs5",
-        key = "your census adi key")
+        key = "your census api key")
+# need to sign up for an api key through the census website
