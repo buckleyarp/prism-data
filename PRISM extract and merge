@@ -94,6 +94,7 @@ extracted_data <- lapply(results_list, function(df) {
 })
 
 # merges all extracted datasets within the extracted_data list, output is a column of zipcodes and x columns of Tmax daily values
+# it's important that there are no duplicated ZCTAs within each list item, it will not run correctly if there are
 final_dataset <- Reduce(function(x, y) {
   merge(x, y, by = "ZCTA5CE10", all.x = TRUE)
 }, extracted_data)
