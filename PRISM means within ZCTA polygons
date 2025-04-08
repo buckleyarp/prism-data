@@ -9,7 +9,7 @@ rast_mean <- extract(prism, zcta, fun = mean)
 
 # adds the calculated values to the ZCTA shapefile in the column tmax
 # the rast_mean output is only the numbers. they are in the order of the ZCTAs listed within the shapefile so it is important not to reorder them before merging
-zcta$tmax <- rast_mean[1:6502]
+zcta$tmax <- rast_mean[1:length of your dataset]
 
 # comparing this output with the output of the centroids gives a correlation coefficient of 0.9996447
 cor.test(test$Tmax, test$ExtractValue_PRISM_tmax_stable_4kmD2_20130101_bil)
