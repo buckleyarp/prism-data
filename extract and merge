@@ -1,4 +1,3 @@
-install.packages("prism")
 library(devtools)
 install_github("ropensci/prism")
 library(prism)
