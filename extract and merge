@@ -9,7 +9,7 @@ library(terra)
 library(data.table)
 
 
-##get daily PRISM data for maximum temperature
+##get daily PRISM data for maximum temperature from jan 1, 2013 to dec 31, 2023
 #this saves into a folder on your computer labeled prismtmp
 
 prism_set_dl_dir("~/prismtmp")
@@ -41,7 +41,7 @@ folder_names <- list.files(base_dir, full.names = TRUE)
 # Initialize an empty list to store results
 results_list <- list()
 
-# Loop through each folder and process its corresponding raster file
+# Loop through each folder and process its corresponding raster file (may take a long time)
 for (folder in folder_names) {
   # Construct the file path for the raster file
   raster_file <- file.path(folder, paste0(basename(folder), ".bil"))
