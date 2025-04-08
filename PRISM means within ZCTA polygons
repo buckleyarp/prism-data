@@ -1,7 +1,7 @@
 ## finding the average Tmax value within a ZCTA polygon
 
 # importing a PRISM file as a raster
-prism <- raster("prism_files/PRISM_tmax_stable_4kmD2_20130101_bil/PRISM_tmax_stable_4kmD2_20130101_bil.bil")
+prism <- raster("file path to your stored .bil file")
 
 # calculates the mean value for the prism raster within each ZCTA polygon
 rast_mean <- extract(prism, zcta, fun = mean)
