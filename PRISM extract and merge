@@ -22,10 +22,10 @@ get_prism_dailys(
 
 ## extract the daily data and find the value for each centroid of ZCTAs, combined into one file
 # this example uses a centroid dataset calculated in ArcGIS pro
+# this uses centroids, when tested using the averages within each ZCTA polygon the correlation was 0.9996447 and centroids run faster
 
 # making a centroids dataset (csv) into a shapefile
 # skip if already in shapefile format (ie centroids were calculated in R and not converted to .csv)
-# centroids are used for this as the correlate with ZCTA average values by .99
 csv_sf <- st_as_sf(midwest_centroids, coords = c("INTPTLON10", "INTPTLAT10"))
 str(csv_sf)
 
