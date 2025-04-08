@@ -1,9 +1,16 @@
-##get daily PRISM data
-
 install.packages("prism")
 library(devtools)
 install_github("ropensci/prism")
 library(prism)
+library(sf)
+library(dplyr)
+library(tidyverse)
+library(terra)
+library(data.table)
+
+
+##get daily PRISM data for maximum temperature
+#this saves into a folder on your computer labeled prismtmp
 
 prism_set_dl_dir("~/prismtmp")
 
@@ -20,8 +27,12 @@ get_prism_dailys(
 csv_sf <- st_as_sf(midwest_centroids, coords = c("INTPTLON10", "INTPTLAT10"))
 str(csv_sf)
 
+#setting datum/projection so both datasets are matching
+st_crs(csv_sf) <- 4326
+
 # Base directory containing your dated folders/files
-base_dir <- "/file_path_to_folder_containing_files"
+#for example "/Users/lilyarp/prismtmp/prism_files" with all extracted prism files put into folder prism_files within prismtmp
+base_dir <- "file_path_to_folder_containing_files"
 
 # List of folder names (replace this with your folder name structure)
 folder_names <- list.files(base_dir, full.names = TRUE)
@@ -70,25 +81,16 @@ for (folder in folder_names) {
 }
 
 
-# Initialize an empty data frame for results
-final_data <- NULL
+# for each item in results_list, extracts columns 3 and 12 (zip code and Tmax) and removes the geometry attributes
+extracted_data <- lapply(results_list, function(df) {
+  dt <- as.data.table(df[, c(3, 12)])
+  dt$geometry <- NULL # Remove the "geometry" column if it exists as a list
+  dt
+})
 
-# Loop through each result in the results_list
-for (name in names(results_list)) {
-  # Extract the non-spatial data (attributes) from the current `sf` object
-  df_subset <- st_drop_geometry(results_list[[name]])[, c(3, 12)]
-  
-  # Rename column 12 to include the file identifier (folder name or unique identifier)
-  colnames(df_subset)[2] <- paste0("Value_", name)
-  
-  # If it's the first iteration, initialize final_data
-  if (is.null(final_data)) {
-    final_data <- df_subset
-  } else {
-    # Merge based on column 3 (zip codes)
-    final_data <- merge(final_data, df_subset, by = colnames(df_subset)[1], all = TRUE)
-  }
-}
+# merges all extracted datasets within the extracted_data list, output is a column of zipcodes and x columns of Tmax daily values
+final_dataset <- Reduce(function(x, y) {
+  merge(x, y, by = "ZCTA5CE10", all.x = TRUE)
+}, extracted_data)
 
-# View the final result
-print(final_data)
+
