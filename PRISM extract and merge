@@ -29,7 +29,7 @@ str(csv_sf)
 # setting datum/projection so both datasets are matching
 st_crs(csv_sf) <- 4326
 
-# remove duplicated ZCTAs (crossing state boundaries)
+# remove duplicated ZCTAs if not done previously (crossing state boundaries)
 csv_sf <- csv_sf %>%
   distinct(ZCTA5CE10,.keep_all = TRUE)
 
